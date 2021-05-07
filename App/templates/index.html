@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+        <title>Covid 19 Detection using CNN</title>
+    </head>
+    <body>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            
+            <input type = "file" name = "file" />
+            <input type = "submit"/>
+
+        </form>
+
+        <br>
+        <h3 style="align-items: center;">{{pred}}</h3>
+        <br>
+
+    </body>
+</html>
