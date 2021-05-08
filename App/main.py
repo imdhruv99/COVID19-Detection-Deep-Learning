@@ -3,7 +3,7 @@ from flask import Flask, request, url_for, redirect, render_template
 
 # keras and tensorflow for loading pretrained model
 from keras.models import *
-from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import img_to_array, load_img
 from keras.applications import imagenet_utils
 
 # resize will resize the image
@@ -35,14 +35,12 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(app.root_path ,'static','img')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
 def prepare_image(image, target):
 
 	# resize the input image and preprocess it
 	image = image.resize(target)
 	image = img_to_array(image)
 	image = np.expand_dims(image, axis=0)
-	image = imagenet_utils.preprocess_input(image)
 
 	# return the processed image
 	return image
@@ -63,21 +61,22 @@ def predict():
         # save the image to the upload folder, for display on the webpage.
         save_image = Image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], Image_file.filename))
 
-        # read the image in PIL format
         with open(os.path.join(app.config['UPLOAD_FOLDER'], Image_file.filename), 'rb') as f:
-                read_image = Image.open(io.BytesIO(f.read()))
+            read_image = Image.open(io.BytesIO(f.read()))
 
-
-        # preprocess the image and prepare it for classification
         processed_image = prepare_image(read_image, target=(224, 224))
 
-        prediction = model.predict(processed_image)
-        results = imagenet_utils.decode_predictions(prediction)
+        # Image_file = img_to_array(save_image)
+        # Image_file = np.expand_dims(Image_file,axis=0)
 
-    if results > str(0.5):
-        return render_template('index.html', pred = 'SARS-COV-19: POSITIVE\nProbability of SARS-COV-19 is {}:'.format(results))
-    else:
-        return render_template('index.html', pred = 'SARS-COV-19: NEGATIVE\nProbability of SARS-COV-19 is {}:'.format(results))
+        prediction = model.predict_classes(processed_image)
+            
+    return render_template('index.html', pred = 'SARS-COV-19: POSITIVE\nProbability of SARS-COV-19 is {}:'.format(prediction))
+
+    # if results > str(0.5):
+    #     return render_template('index.html', pred = 'SARS-COV-19: POSITIVE\nProbability of SARS-COV-19 is {}:'.format(results))
+    # else:
+    #     return render_template('index.html', pred = 'SARS-COV-19: NEGATIVE\nProbability of SARS-COV-19 is {}:'.format(results))
 
 
 
